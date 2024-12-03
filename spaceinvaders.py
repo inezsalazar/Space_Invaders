@@ -432,22 +432,37 @@ class SpaceInvaders(object):
 							self.allSprites.add(self.bullets)
 							self.sounds["shoot2"].play()
 	def get_action(self):
-		self.keys = key.get_pressed()
-		for e in event.get():
-			if e.type == QUIT:
-				sys.exit()
-		action = randint(0,2)
-		if(action == 0):
-			self.shoot()
-		if(action == 1):
-			self.player.move_left()
-		if(action == 2):
-			self.player.move_right()
-	def get_genetic_action(self):
-		self.keys = key.get_pressed()
-		for e in event.get():
-			if e.type == QUIT:
-				sys.exit()
+	    self.keys = key.get_pressed()
+	    for e in event.get():
+	        if e.type == QUIT:
+	            sys.exit()
+	    
+	    # Determine the ship's current position
+	    ship_x = self.player.rect.x
+
+	    # Dynamic action list based on ship position
+	    if ship_x < 100:  # Close to the far left
+	    	#self.player.move_right()
+	    	#self.player.move_right()
+	    	self.player.rect.x = 200
+	    	actions = [2, 2, 0, 1, 2, 2]  # Favor moving right
+	    elif ship_x > 700:  # Close to the far right
+	    	self.player.rect.x = 550
+	    	actions = [1, 1, 0, 2, 1, 1]  # Favor moving left
+	    else:  # In the middle range
+	        actions = [1, 2, 0]  # Allow equal movement and shooting
+
+	    # Randomly choose an action from the list
+	    action = choice(actions)
+
+	    # Perform the chosen action
+	    if action == 0:
+	        self.shoot()
+	    elif action == 1 and self.player.rect.x > 10:  # Ensure it doesn't move out of bounds
+	        self.player.move_left()
+	    elif action == 2 and self.player.rect.x < 740:  # Ensure it doesn't move out of bounds
+	        self.player.move_right()
+
 
 	def shoot(self):
 		if len(self.bullets) == 0 and self.shipAlive:
